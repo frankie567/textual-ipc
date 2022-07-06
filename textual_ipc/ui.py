@@ -1,9 +1,8 @@
-import asyncio
 import functools
 from multiprocessing.connection import Client
 import sys
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Type, cast
+from typing import TYPE_CHECKING, Any, Optional, Type, cast
 
 from rich.console import Console
 from textual._context import active_app
@@ -31,12 +30,12 @@ class UI(App):
         self,
         socket_addr: str,
         screen: bool = True,
-        driver_class: Type[Driver] | None = None,
+        driver_class: Optional[Type[Driver]] = None,
         log: str = "",
         log_verbosity: int = 1,
         title: str = "Textual Application",
-        in_fileno: int | None = None,
-        out_fileno: int | None = None,
+        in_fileno: Optional[None] = None,
+        out_fileno: Optional[None] = None,
     ) -> None:
         self.in_fileno = in_fileno if in_fileno is not None else sys.stdin.fileno()
         self.socket_addr = socket_addr

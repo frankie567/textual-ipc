@@ -1,6 +1,6 @@
 from multiprocessing import Process
 import sys
-from typing import Type
+from typing import Optional, Type
 import uuid
 
 from textual_ipc.ui import UI
@@ -8,7 +8,7 @@ from textual_ipc.worker import Worker
 
 
 def run(
-    ui_class: Type[UI], worker_class: Type[Worker], socket_addr: str | None = None
+    ui_class: Type[UI], worker_class: Type[Worker], socket_addr: Optional[str] = None
 ) -> None:
     socket_addr = socket_addr or str(uuid.uuid4())
 
