@@ -4,7 +4,6 @@ import sys
 from threading import Thread
 from typing import TYPE_CHECKING, Any, Optional, Type, cast
 
-from rich.console import Console
 from textual._context import active_app
 from textual.app import App, WINDOWS
 from textual.events import Event
@@ -29,19 +28,25 @@ class UI(App):
     def __init__(
         self,
         socket_addr: str,
-        screen: bool = True,
         driver_class: Optional[Type[Driver]] = None,
-        log: str = "",
-        log_verbosity: int = 1,
-        title: str = "Textual Application",
         in_fileno: Optional[None] = None,
         out_fileno: Optional[None] = None,
     ) -> None:
         self.in_fileno = in_fileno if in_fileno is not None else sys.stdin.fileno()
         self.socket_addr = socket_addr
         self.out_fileno = out_fileno if out_fileno is not None else sys.stdout.fileno()
-        super().__init__(screen, driver_class, log, log_verbosity, title)
-        self.console = Console(file=open(self.out_fileno, "w"))
+        super().__init__(driver_class)
+
+    @classmethod
+    def create_and_run(
+        cls,
+        socket_addr: str,
+        driver_class: Optional[Type[Driver]] = None,
+        in_fileno: Optional[None] = None,
+        out_fileno: Optional[None] = None,
+    ):
+        app = cls(socket_addr, driver_class, in_fileno, out_fileno)
+        return app.run()
 
     def get_driver_class(self) -> Type[Driver]:
         driver_class: functools.partial[Driver]
@@ -57,11 +62,11 @@ class UI(App):
             driver_class = functools.partial(LinuxFDDriver, self.in_fileno)
         return cast(Type[Driver], driver_class)
 
-    async def process_messages(self) -> None:
+    async def _process_messages(self) -> None:
         active_app.set(self)
         connect_socket_event = ConnectSocket(sender=self)
         await self.post_message(connect_socket_event)
-        await super().process_messages()
+        await super()._process_messages()
 
     async def shutdown(self):
         await super().shutdown()

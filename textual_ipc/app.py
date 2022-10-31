@@ -14,9 +14,8 @@ def run(
 
     p_worker = Process(target=worker_class.run, args=(socket_addr,))
     p_ui = Process(
-        target=ui_class.run,
+        target=ui_class.create_and_run,
         kwargs={
-            "log": "textual.log",
             "socket_addr": socket_addr,
             "in_fileno": sys.stdin.fileno(),
             "out_fileno": sys.stdout.fileno(),
